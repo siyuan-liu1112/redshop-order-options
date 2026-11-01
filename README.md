@@ -39,7 +39,8 @@ npm start
 npm test
 ```
 
-解压源码并上传到自己的 GitHub 仓库，在 Settings → Pages 选择 GitHub Actions。仓库内已包含部署工作流；部署内容为 dist/。这份交付提供可运行源码，不代表已代替作者创建 GitHub 仓库。
+本仓库提供完整演示源码与测试。可通过页面顶部的“在线体验”直接使用 Demo，也可下载源码后按上述命令在本地运行。
+
 
 ## 演示边界
 
