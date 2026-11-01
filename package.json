@@ -1,0 +1,1 @@
+{"name":"redshop-order-options","version":"1.0.0","private":true,"type":"module","description":"Independent Redshop order-adjustment product demo","scripts":{"test":"node --test tests/*.test.js","start":"node server.mjs"},"engines":{"node":">=20"}}
