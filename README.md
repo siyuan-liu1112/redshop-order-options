@@ -1,87 +1,57 @@
-# Redshop · Order Options
+# Redshop Order Options｜跨境购物整单调整 Demo
 
-[中文体验与运行说明](README.zh-CN.md) · [Verification record](QA.md)
+[English](./README.en.md) · [在线体验](https://redshop-order-studio-siyuan.cosmicvenus32.chatgpt.site/)
 
-**Keep what matters.** An independent product-design prototype by Siyuan Liu (刘思源).
+**当结算总价改变购买决定时，保留最想要的东西，比较可接受的调整方案。**
 
-A fixed two-item cart → complete checkout quote → optional order adjustment → editable requirements → exact change review → version-checked update / undo. No purchase is made.
+刘思源｜产品经理实习笔试交互 Demo。独立概念设计，未接入小红书真实交易系统。
 
-## Run in one command
+## 建议先体验这条路径（约 90 秒）
 
-Requires Node.js 20+. No package installation or API key:
+1. 购物车中已有项链和花杯，点击 **Check out(2)**。
+2. 查看整单 **$67.00**，在 Payment details 下点击 **See order options**。
+3. 默认建议探索花朵杯替代款，完整测试报价 **$50.50**；没有默认锁定的商品。在 **Other ways to lower your total** 中点 **Keep my original mug**，预览保留原杯、替换项链的方案 **$62.34**；要将原杯设为后续必须保留的条件，点 **Choose** 并勾选。支持确认更新和撤销。
+4. **Review changes → Update order → Undo**，体验确认、更新和恢复。
+5. 在右侧选择 **Still floral, and under $40**，确认条件。系统返回无匹配，不会偷偷放宽要求。
+6. 选择 **Test a failure → Shipping increases by $2**，再次确认方案。新价格需要二次确认。
 
-```sh
+左侧 Guided walkthrough 会自动操作真实界面；视频提供带说明的浏览器画面导览。
+
+## AI 用在哪里
+
+真实 Qwen2.5 0.5B 模型把完整自然语言要求转换成可编辑条件；候选商品、费用与可执行性由固定数据和代码判断。模型不能生成价格，也不能直接替用户改订单。
+
+点击 **Load local language model** 后可输入或说出要求。优先使用 WebGPU，缺少 GPU 时使用 CPU/WASM。无需 API key、支付账户或付费推理服务。首次下载数百 MB，CPU 推理可能需要数十秒。请在有网络、内存充足的现代浏览器中运行。
+
+小模型可能误解要求，尤其是否保留原商品。界面始终要求用户检查条件。右侧预设是明确标注的场景样本，不伪装成模型输出；不加载模型也可以完整演示产品流程。
+
+## 语音
+
+真实调用麦克风录音，可停止、回放并编辑转写。浏览器语音服务可能将音频发送给其服务提供方；也可选择 Local Whisper 在设备上处理。HTTPS 或 localhost 才能使用麦克风。测试环境没有物理麦克风，因此不声称完成了真人录音端到端验收，详见 QA.md。
+
+## 本地运行与 GitHub
+
+需要 Node.js 20 或更新版本，无需安装依赖：
+
+```bash
 npm start
+# 打开 http://localhost:8080
+npm test
 ```
 
-Open **http://localhost:8080**. Do not double-click `index.html`: module loading and microphone permissions require a web origin. Run checks with `npm test`.
+解压源码并上传到自己的 GitHub 仓库，在 Settings → Pages 选择 GitHub Actions。仓库内已包含部署工作流；部署内容为 dist/。这份交付提供可运行源码，不代表已代替作者创建 GitHub 仓库。
 
-## Recommended 90-second exploration
+## 演示边界
 
-1. Click **Check out(2)**. Scroll within the phone to **Payment details**. The complete fixture total is **$67.00**.
-2. Open **See order options**. The suggested floral-mug replacement totals **$50.50**. No item is locked. Under **Other ways to lower your total**, select **Keep my original mug** to compare a **$62.34** necklace replacement, then review, update, and Undo.
-3. Open **Review changes**, then **Update order**. The order updates only after confirmation; **Undo** restores the prior draft.
-4. Use the “Still floral, and under $40” scenario. Confirm conditions. No matching offer is returned; edit the requirement or return unchanged.
-5. Try **Test a failure → Shipping increases by $2**, then confirm an option. A second confirmation is required; a quote exceeding the budget cannot apply.
+- 购物车固定两件商品，数量固定。每个方案最多替换一件商品：杯子或项链。
+- 商品图片来自作者提供的截图；替代花杯与雏菊项链为明确标注的虚构商品，使用 AI 生成插图。
+- 全部报价为整分计算的测试数据，用于稳定复现方案，不是当前售价。初始整单 $67.00；花朵杯方案 $50.50、普通杯方案 $24.80、保留原杯并换项链方案 $62.34。所有数字为模拟报价。
+- 浏览记录和历史偏好只是可切换的模拟上下文；只改变排序，不覆盖用户的硬条件。
+- 不收集真实地址，不连接钱包，不产生订单或扣款。
 
-The automatic **Guided walkthrough** operates the actual interface. Scenario shortcuts are clearly labeled fixtures, not generated AI output.
-
-## Real AI, without API bills
-
-The app calls **Qwen2.5-0.5B-Instruct** through **WebLLM 0.2.79** (GPU) or **Transformers.js 3.8.1** (CPU / WASM) in a Web Worker. This is real on-device model inference, not a hosted API or a keyword parser. It extracts constraints from arbitrary English/Chinese input, updating only explicitly mentioned requirements and preserving previous conditions. The user checks the interpretation before refreshing options. GPU availability is checked; the CPU path works without WebGPU, but can be slower. Output is validated and shown for correction before use. A conservative explicit-wording rule prevents unsupported exact-mug locks; any correction is disclosed in the form. This rule does not replace model interpretation of the other fields.
-
-- Open **On-device AI & voice → Load local language model**, or type a request and choose **Load AI & interpret**.
-- Requires a secure context (HTTPS / localhost), a modern browser/device, sufficient memory, and access to model/CDN hosts. Initial model download is substantial (hundreds of MB); progress appears in the panel. No payment account or billing API is used.
-- Small-model extraction is fallible. All conditions remain editable. Unsupported or invalid results fail visibly.
-- Manual conditions work without a model and are explicitly identified as manual, never mislabeled as AI.
-- Images are used by the interface and fixed catalogue; this version's model input is **text**, not live image reasoning. Simulated browsing/history affects deterministic ranking. No Xiaohongshu data is accessed.
-
-## Real voice
-
-Microphone audio is captured with `getUserMedia` + `MediaRecorder`, with a 30-second limit and local playback. Choose either:
-
-- **Browser speech service**: native SpeechRecognition where supported. May send audio to the browser's provider; requires that service and network.
-- **Local Whisper**: Transformers.js 3.8.1 / `onnx-community/whisper-tiny`, q8, WASM in a Worker. Downloads model assets, then transcribes recorded audio locally. English and Mandarin supported.
-
-Review/edit the transcript before language-model interpretation. Permission denial, no device, recognition errors and model-loading errors are shown. Closing the sheet stops microphone tracks. Recordings are held in memory, not uploaded to a Redshop server or stored in the repository.
-
-## What is real vs simulated
-
-| Real implementation | Explicitly simulated |
-|---|---|
-| Navigation, modals, expandable details, text editing, input validation | Merchandise availability, prices, fees, eligibility, stock failures |
-| Audio capture, playback and speech-recognition integrations | Destination fixed to New York 10018 |
-| On-device LLM request / JSON validation / condition confirmation | Session/history context, no account-data connection |
-| Constraint filtering, cent-based totals, state/version updates, undo | Payment method and purchase completion |
-
-The initial cart always contains a necklace and a floral cup. The recommendation pool has two mug alternatives and one necklace alternative. Fictional floral mug and necklace SKUs use separately labeled AI-generated illustrations. Explicit keep requirements protect items; each candidate changes at most one item. There is no unrestricted catalogue browsing, quantity editing, removal, real address, login or payment.
-
-## Structure
-
-- `dist/app.js`: interface state, transitions, input, voice lifecycle, model calls.
-- `dist/engine.js`: catalogue fixtures, integer-cent quotes, constraints and order-version checks.
-- `dist/ai-worker.js`: real local language-model loading and inference.
-- `dist/asr-worker.js`: real local Whisper transcription.
-- `dist/style.css`: responsive studio, phone shell and native-inspired components.
-- `tests/engine.test.js`: invariants for totals, budgets, preferences, no-match, stale updates.
-- `.github/workflows/pages.yml`: optional GitHub Pages deployment. Repository owner enables Pages with GitHub Actions.
-
-## Publishing
-
-The `dist/` folder can be hosted on any HTTPS static host. GitHub Pages workflow is included. Do **not** commit API keys; none are needed. The included photos come from the author's supplied shopping screenshots and are retained as product-design reference materials. Third-party brands and images are not claimed as original work or relicensed. Source-code license applies only to original code.
-
-## References
-
-- WebLLM: https://webllm.mlc.ai/docs/
-- Transformers.js: https://huggingface.co/docs/transformers.js/
-- Microphone: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
-- SpeechRecognition: https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition
-
-## Validation limits
-
-See `QA.md` for executed checks and environment-specific verification limits. A demo is not evidence of live platform integration, conversion uplift, or production readiness.
+实现与测试结构见 [英文说明](README.en.md)。测试记录见 QA.md。
 
 
-## Focused refinement — 1 November 2026
+## 提交版验证范围
 
-38 deterministic engine checks pass. Added single-object pronoun preservation, targeted clarification for ambiguous protection, replacement-seller coupon consistency, and optional saved-original-cup ranking. Before/after previews expose losses before confirmation. Per-condition source labels distinguish interpreted requests from confirmed selections. Browser speech and local Whisper remain implemented but physical microphone transcription is not verified in this environment. Three replacement fixtures remain deliberately bounded.
+38 项决策逻辑检查通过；金额、预算、条件保留、报价变化和撤销均有覆盖。推荐页已精简，核心差异直接显示，推荐依据按需展开。语音接口已实现，但真实麦克风端到端转写仍待设备验证。此 Demo 未进行美国目标用户正式可用性测试。
